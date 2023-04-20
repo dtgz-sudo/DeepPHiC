@@ -12,7 +12,7 @@ def train(tissues, args):
         ########## load files ##########
         print(tissue, 'loading files...')
         x1_seq, x2_seq, x1_read, x2_read, x1_dist, x2_dist, y = get_features(
-            tissue, 
+            tissue,
             args.type
         )
 
@@ -36,37 +36,37 @@ def train(tissues, args):
         print(f'training DeepPHiC...')
         np.random.seed(0)
         model = DeepPHiC(learning_rate=args.lr, dropout=args.dropout)
-        model.model.set_weights(base_model.get_weights()) 
+        model.model.set_weights(base_model.get_weights())
 
         # only fine-tune the classifier
         if not args.train_full:
             for layer in model.model.layers[:-3]:
                 layer.trainable = False
 
-        model.fit(
-            x1_seq[train_idx], x2_seq[train_idx], 
-            x1_read[train_idx], x2_read[train_idx],
-            x1_dist[train_idx], x2_dist[train_idx], y[train_idx],
-            validation_data=(
-                [x1_seq[val_idx], x2_seq[val_idx],
-                x1_read[val_idx], x2_read[val_idx],
-                x1_dist[val_idx], x2_dist[val_idx]], y[val_idx]
-            ),
-            epochs=args.epochs
-        )
+        # model.fit(
+        #     x1_seq[train_idx], x2_seq[train_idx],
+        #     x1_read[train_idx], x2_read[train_idx],
+        #     x1_dist[train_idx], x2_dist[train_idx], y[train_idx],
+        #     validation_data=(
+        #         [x1_seq[val_idx], x2_seq[val_idx],
+        #         x1_read[val_idx], x2_read[val_idx],
+        #         x1_dist[val_idx], x2_dist[val_idx]], y[val_idx]
+        #     ),
+        #     epochs=args.epochs
+        # )
         y_hat = model.predict(
-            x1_seq[test_idx], x2_seq[test_idx], 
+            x1_seq[test_idx], x2_seq[test_idx],
             x1_read[test_idx], x2_read[test_idx],
             x1_dist[test_idx], x2_dist[test_idx]
         )
         stats = get_stats(y[test_idx], y_hat)
 
-        ########## save results ########## 
-        RESULT_FILE = '../results/stats/DeepPHiC_finetune_{}_{}.json'.format(
-            tissue, args.type
-        )
-        with open(RESULT_FILE, 'w', encoding='utf-8') as f:
-            json.dump(stats, f, ensure_ascii=False, indent=4)
+        # ########## save results ##########
+        # RESULT_FILE = '../results/stats/DeepPHiC_finetune_{}_{}.json'.format(
+        #     tissue, args.type
+        # )
+        # with open(RESULT_FILE, 'w', encoding='utf-8') as f:
+        #     json.dump(stats, f, ensure_ascii=False, indent=4)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Arguments for training.')
@@ -84,11 +84,11 @@ if __name__ == '__main__':
         '--dropout', default=0.2, type=float, help='dropout'
     )
     parser.add_argument(
-        '--train_full', default=True, type=bool, 
+        '--train_full', default=True, type=bool,
         help='whether to fine-tune only the classifier or entire model'
     )
     parser.add_argument(
-        '--test', default=True, type=bool, 
+        '--test', default=True, type=bool,
         help='test flag to work on sample data'
     )
     args = parser.parse_args()

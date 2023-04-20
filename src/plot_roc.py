@@ -25,6 +25,7 @@ def plot_roc(model, label, args):
     plt.ylabel('True Positive Rate', fontsize=15)
     plt.legend(loc="lower right")
     plt.title('ROC Curve - {} {}'.format(args.tissue, args.type), fontsize=15)
+    plt.show()
     plt.savefig('../results/plots/roc_curve_{}_{}.jpg'.format(args.tissue, args.type), dpi=250)
 
 if __name__ == '__main__':
