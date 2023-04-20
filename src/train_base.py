@@ -13,7 +13,7 @@ def train(tissues, args):
         ########## load files ##########
         print(tissue, 'loading files...')
         x1_seq, x2_seq, x1_read, x2_read, x1_dist, x2_dist, y = get_features(
-            tissue, 
+            tissue,
             args.type
         )
 
@@ -50,7 +50,7 @@ def train(tissues, args):
         )
         stats = get_stats(y[test_idx], y_hat)
 
-        ########## save results ########## 
+        ########## save results ##########
         RESULT_FILE = '../results/stats/DeepPHiC_base_{}_{}.json'.format(
             tissue, args.type
         )
@@ -73,7 +73,7 @@ if __name__ == '__main__':
         '--dropout', default=0.2, type=float, help='dropout'
     )
     parser.add_argument(
-        '--test', default=True, type=bool, 
+        '--test', default=True, type=bool,
         help='test flag to work on sample data'
     )
     args = parser.parse_args()
@@ -86,6 +86,6 @@ if __name__ == '__main__':
                 tissues = json.load(f)['pe']
             else:
                 tissues = json.load(f)['pp']
-
+    print(tissues)
     train(tissues, args)
     print('done')

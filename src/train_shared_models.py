@@ -4,9 +4,10 @@ import numpy as np
 from utils import *
 from DeepPHiC import DeepPHiC
 
+from tensorflow import keras
 def train(tissues, args):
     # Leave the tissue that you want to train the model for, otherwise, training
-    # data might leak into the testing data during fine-tuning. 
+    # data might leak into the testing data during fine-tuning.
     for tissue_of_concern in tissues:
 
         print('training model for', tissue_of_concern)
@@ -35,12 +36,12 @@ def train(tissues, args):
             )
 
             ########## split into train and val ##########
-            N = len(x1_seq)        
+            N = len(x1_seq)
             train_idx, val_idx, test_idx = get_split(N)
 
             # merge train and test data for shared model
             # effective split - train : val = 0.85 : 0.15
-            train_idx = np.hstack([train_idx, test_idx])                            
+            train_idx = np.hstack([train_idx, test_idx])
 
             ########## normalize data ##########
             x1_read = normalize(x1_read, train_idx)
@@ -76,20 +77,23 @@ def train(tissues, args):
         print(f'training shared DeepPHiC...')
         np.random.seed(0)
         model = DeepPHiC(learning_rate=args.lr, dropout=args.dropout)           # a higher dropout would prevent overfitting
+        model = keras.models.load_model('../models/shared/DeepPHiC_{}_{}.h5'.format(
+            tissue_of_concern, args.type
+        ))
         model.fit(
-            features_train['x1_seq'], features_train['x2_seq'], 
+            features_train['x1_seq'], features_train['x2_seq'],
             features_train['x1_read'] , features_train['x2_read'],
             features_train['x1_dist'] , features_train['x2_dist'], label_train,
             validation_data=(
-                [features_val['x1_seq'], features_val['x2_seq'], 
+                [features_val['x1_seq'], features_val['x2_seq'],
                 features_val['x1_read'], features_val['x2_read'],
                 features_val['x1_dist'], features_val['x2_dist']], label_val
             ),
             epochs=args.epochs
         )
-        model.save_model('../models/shared/DeepPHiC_{}_{}.h5'.format(
-            tissue_of_concern, args.type
-        ))
+        # model.save_model('../models/shared/DeepPHiC_{}_{}.h5'.format(
+        #     tissue_of_concern, args.type
+        # ))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Arguments for training.')
@@ -107,7 +111,7 @@ if __name__ == '__main__':
         '--dropout', default=0.5, type=float, help='dropout'
     )
     parser.add_argument(
-        '--test', default=True, type=bool, 
+        '--test', default=True, type=bool,
         help='test flag to work on sample data'
     )
     args = parser.parse_args()
