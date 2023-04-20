@@ -77,9 +77,9 @@ def train(tissues, args):
         print(f'training shared DeepPHiC...')
         np.random.seed(0)
         model = DeepPHiC(learning_rate=args.lr, dropout=args.dropout)           # a higher dropout would prevent overfitting
-        model = keras.models.load_model('../models/shared/DeepPHiC_{}_{}.h5'.format(
-            tissue_of_concern, args.type
-        ))
+        # model = keras.models.load_model('../models/shared/DeepPHiC_{}_{}.h5'.format(
+        #     tissue_of_concern, args.type
+        # ))
         model.fit(
             features_train['x1_seq'], features_train['x2_seq'],
             features_train['x1_read'] , features_train['x2_read'],
@@ -105,7 +105,7 @@ if __name__ == '__main__':
         '--epochs', default=200, type=int, help='maximum training epochs'
     )
     parser.add_argument(
-        '--lr', default=1e-3, type=int, help='learning rate'
+        '--lr', default=1e-3, type=float, help='learning rate'
     )
     parser.add_argument(
         '--dropout', default=0.5, type=float, help='dropout'
